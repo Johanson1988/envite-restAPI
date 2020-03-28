@@ -13,6 +13,6 @@ const cardSchema = new Schema({
     },
   });
   
-  const Question = mongoose.model('Question', questionSchema);
+  const Card = mongoose.model('Card', cardSchema);
   
-  module.exports = Question;
+  module.exports = Card;
