@@ -6,17 +6,18 @@ const movementSchema = new Schema({
     playerRef: {type: mongoose.Schema.Types.ObjectId, ref: 'Game', required: true},
     isCaptain: {type:Boolean, required: true},
     movementType: {type:String, enum:['envidar', 'siete', 'nueve', 'chico-fuera', 'querer', 'jugar-callado','no-querer'], required: true},
-    staus: {type:String, enum:['normal', 'envido', 'siete', 'nueve', 'chico-fuera']},
+    status: {type:String, enum:['normal', 'envido', 'siete', 'nueve', 'chico-fuera'], required: true},
     playedBy: {type: mongoose.Schema.Types.ObjectId, ref: 'Player', required: true},
     cardPlayed: {type: mongoose.Schema.Types.ObjectId, ref: 'Card', required: true},
     position: {type: Number, enum:[1,2,3,4,5,6,7,8,9,10], required: true},
     stonesTeamA: {type: Number, required: true},
     stonesTeamB: {type: Number, required: true},
     playerTeam: {type: String, enum:['team-a', 'team-b']},
-    ronda: {type:Number, enum:[1,2,3]},
+    ronda: {type:Number, enum:[1,2,3], required: true},
     gameScoreTeamA: {type: Number, required: true},
     gameScoreTeamB: {type: Number, required: true},
-    pointsToWin: {type: Number, required: true}
+    pointsToWin: {type: Number, required: true},
+    arrastrando: {type: Boolean, required: true}
   }, {
     timestamps: {
       createdAt: 'created_at',
