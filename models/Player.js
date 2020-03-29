@@ -8,7 +8,8 @@ const playerSchema = new Schema({
   gamesPlayed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game'}],
   gamesCreated : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game'}],
   gamesWon : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game'}],
-  movementsList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movements'}],
+  movementsList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movement'}],
+  chicosPlayed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chico'}],
   photoUrl: {type: 'String'}
   }, {
     timestamps: {

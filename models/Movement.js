@@ -7,7 +7,7 @@ const movementSchema = new Schema({
     isCaptain: {type:Boolean, required: true},
     movementType: {type:String, enum:['envidar', 'siete', 'nueve', 'chico-fuera', 'querer', 'jugar-callado','no-querer'], required: true},
     staus: {type:String, enum:['normal', 'envido', 'siete', 'nueve', 'chico-fuera']},
-    playedBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
+    playedBy: {type: mongoose.Schema.Types.ObjectId, ref: 'Player', required: true},
     cardPlayed: {type: mongoose.Schema.Types.ObjectId, ref: 'Card', required: true},
     position: {type: Number, enum:[1,2,3,4,5,6,7,8,9,10], required: true},
     stonesTeamA: {type: Number, required: true},
