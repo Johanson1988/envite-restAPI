@@ -24,14 +24,28 @@ var server = http.createServer(app);
 var io = require('socket.io')(server);
 const socketAuth = require('socketio-auth');
 
+const gameId = 'dummyGameId';
+
 io.on('connection', function(socket){
   console.log(`User connected: ${socket.id}`);
+  socket.join(gameId);
+  socket.emit('socket', 'cafe');
+  io.of('/').in(gameId).clients((error, data)=> {
+    if (error) throw error;
+    const namesList = data.map(player =>io.sockets.connected[player].id);  
+    io.of('/').in(gameId).emit('send-list-of-players',namesList);  
+    console.log('Lista de jugadores: ', namesList);
+  });
+
+  socket.on('chat message', function(msg){
+    io.emit('chat message', msg);
+    console.log('message: ' + msg);
+  });
+
   socket.on('disconnect', function(){
     console.log(`User disconnected: ${socket.id}`);
   });
-  socket.on('chat message', function(msg){
-    console.log('message: ' + msg);
-  });
+
 });
 
 /**

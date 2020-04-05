@@ -68,12 +68,22 @@ const connect = () => {
     disconnectButton.disabled = true;
   })
 
+  socket.on('chat message', function(msg){
+      $('#messages').append($('<li>').text(msg));
+    });
+
   socket.open();
 };
 
 const disconnect = () => {
   socket.disconnect();
 }
+
+
+
+/*socket.on('players list', function(msg){
+    console.log('Jugadores online: ' + msg);
+  }); */
 
 const botonEnviar = document.querySelector("#enviar");
 const mensaje = document.querySelector("#m");
@@ -86,20 +96,17 @@ botonEnviar.addEventListener('click', e => {
 })
 
 
+
+
 document.addEventListener('DOMContentLoaded', () => {
   connectButton = document.getElementById('connect');
   disconnectButton = document.getElementById('disconnect');
   statusInput = document.getElementById('status');
   tokenInput = document.getElementById('token');
 });
-   /*   $(function (socket) {
-        $('form').submit(function(e){
-          e.preventDefault(); // prevents page reloading
-          socket.emit('chat message', $('#m').val());
-          $('#m').val('');
-          return false;
-        });
-      });*/
+
+
+
     </script>
   </body>
 </html>
