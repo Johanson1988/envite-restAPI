@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+    <h1>Single User Websocket Demo</h1>
+    <p>
+      <label for="status">Status: </label>
+      <input type="text" id="status"
+        name="status" value="Disconnected"
+        readonly="readonly" style="width: 300px;"
+      />
+    </p>
+    <p>
+      <label for="token">My Token: </label>
+      <input type="text" id="token" name="token" value="secret token" />
+    </p>
+    <p>
+      <button id="connect" onclick="connect()">
+        Connect
+      </button>
+      <button id="disconnect" onclick="disconnect()" disabled>
+        Disconnect
+      </button>
+    </p>
+    <ul id="messages"></ul>
+    <form action="">
+      <input id="m" autocomplete="off" /><button id="enviar">Send</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      const socketUrl = 'http://localhost:3000';
+
+let connectButton;
+let disconnectButton;
+var socket;
+let statusInput;
+let tokenInput;
+
+const connect = () => {
+  socket = io(socketUrl, {
+    autoConnect: false,
+  });
+
+  socket.on('connect', () => {
+    console.log('Connected');
+    statusInput.value = 'Connected';
+    connectButton.disabled = true;
+    disconnectButton.disabled = false;
+  });
+
+  socket.on('disconnect', (reason) => {
+    console.log(`Disconnected: ${reason}`);
+    statusInput.value = `Disconnected: ${reason}`;
+    connectButton.disabled = false;
+    disconnectButton.disabled = true;
+  })
+
+  socket.open();
+};
+
+const disconnect = () => {
+  socket.disconnect();
+}
+
+const botonEnviar = document.querySelector("#enviar");
+const mensaje = document.querySelector("#m");
+
+botonEnviar.addEventListener('click', e => {
+  e.preventDefault();
+  socket.emit('chat message', mensaje.value);
+  mensaje.value = '';
+  console.log('enviado', e);
+})
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  connectButton = document.getElementById('connect');
+  disconnectButton = document.getElementById('disconnect');
+  statusInput = document.getElementById('status');
+  tokenInput = document.getElementById('token');
+});
+   /*   $(function (socket) {
+        $('form').submit(function(e){
+          e.preventDefault(); // prevents page reloading
+          socket.emit('chat message', $('#m').val());
+          $('#m').val('');
+          return false;
+        });
+      });*/
+    </script>
+  </body>
+</html>
