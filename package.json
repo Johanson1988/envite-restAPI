@@ -3,12 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-<<<<<<< HEAD
-    "start": "nodemon ./bin/www"
-=======
     "start": "node ./bin/www",
     "start-dev": "nodemon ./bin/www"
->>>>>>> c3303c887798ddc8497874e4572e3ae944b29106
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -17,14 +13,6 @@
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
-<<<<<<< HEAD
-    "socketio": "^1.0.0",
-    "socketio-auth": "^0.1.1"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.2"
-=======
     "socketio": "^1.0.0"
->>>>>>> c3303c887798ddc8497874e4572e3ae944b29106
   }
 }
