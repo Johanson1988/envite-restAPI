@@ -3,10 +3,24 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const mongoose = require('mongoose');
+require('dotenv').config();
 
 var indexRouter = require('./routes/index');
 
 var app = express();
+
+
+// MONGOOSE CONNECTION
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    keepAlive: true,
+    useNewUrlParser: true,
+    reconnectTries: Number.MAX_VALUE,
+  })
+  .then( () => console.log(`Connected to database`))
+  .catch( (err) => console.error(err));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
