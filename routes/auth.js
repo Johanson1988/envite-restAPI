@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('./../models/User');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const createError = require('http-errors');
 
 // HELPER FUNCTIONS
 const {
@@ -39,7 +40,6 @@ router.post('/login', isNotLoggedIn, validationLoggin, async (req, res, next) =>
 //  POST    '/signup'
 router.post('/signup', isNotLoggedIn, validationLoggin, async (req, res, next) => {
   const { username, password } = req.body;
-
   try {
     const usernameExists = await User.findOne({ username }, 'username');
     

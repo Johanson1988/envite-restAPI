@@ -1,6 +1,7 @@
 const createError = require('http-errors');
 
 exports.isLoggedIn = (req, res, next) => {
+  console.log('isLoggedIn');
   if (req.session.currentUser) next();
   else next(createError(401));
 };
@@ -11,8 +12,7 @@ exports.isNotLoggedIn = (req, res, next) => {
 };
 
 exports.validationLoggin = (req, res, next) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) next(createError(400));
+  const { username, password } = req.body;
+  if (!username || !password) next(createError(400));
   else next();
 };
