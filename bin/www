@@ -56,7 +56,9 @@ socketAuth (io, {
   });
   io.on('connection', socket =>{
     socket.on('chat message', msg => {
-      io.of('/').in(gameId).emit('chat message', msg);
+      io.emit('chat message', msg);
+      //poner chats por gameId
+      //io.of('/').in(gameId).emit('chat message', msg);
       //Incluir guardar chat en la BBDD
     });
   });
