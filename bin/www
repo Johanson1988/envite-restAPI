@@ -26,17 +26,34 @@ const socketAuth = require('socketio-auth');
 
 const gameId = 'dummyGameId';
 
-io.on('connection', function(socket){
-  console.log(`User connected: ${socket.id}`);
-  socket.join(gameId);
-  socket.emit('socket', 'cafe');
-  io.of('/').in(gameId).clients((error, data)=> {
-    if (error) throw error;
-    const namesList = data.map(player =>io.sockets.connected[player].id);  
-    io.of('/').in(gameId).emit('send-list-of-players',namesList);  
-    console.log('Lista de jugadores: ', namesList);
-  });
 
+
+
+socketAuth, (io, {  
+  authenticate: async (socket, data, callback) => {
+    const { _id } = data;
+    
+    try {
+      const user = await verifyUser(_id);
+        console.log('*       Intento de conexion         *');
+        socket.user = user;
+        return callback(null, true);
+      }
+      catch (e) {
+        console.log(`Socket ${socket.id} unauthorized.`);
+        return callback({ message: 'UNAUTHORIZED' });
+      }    
+    },
+    postAuthenticate: socket => {
+      console.log(`Socket ${socket.id} authenticated.`);
+      socket.join(gameId);
+    },
+    disconnect: socket => {
+      console.log(`Socket ${socket.id} disconnected.`);
+    }
+  });
+  
+io.on('connection', function(socket){
   socket.on('chat message', function(msg){
     io.emit('chat message', msg);
     console.log('message: ' + msg);
