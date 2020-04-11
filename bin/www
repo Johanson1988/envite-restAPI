@@ -20,29 +20,31 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
-var io = require('socket.io')(server);
+const server = http.createServer(app);
+const io = require('socket.io')(server);
 const socketAuth = require('socketio-auth');
 
 const gameId = 'dummyGameId';
 
+const verifyUser = _id => new Promise((resolve, reject) => {
+    const User = require('./../models/Player');
+    return User.findOne({_id})
+    .then(userFound => resolve(userFound))
+    .catch( _ => reject('USER_NOT_FOUND'));
+  })
 
-
-
-socketAuth, (io, {  
+socketAuth (io, {  
   authenticate: async (socket, data, callback) => {
     const { _id } = data;
-    
     try {
       const user = await verifyUser(_id);
-        console.log('*       Intento de conexion         *');
-        socket.user = user;
-        return callback(null, true);
-      }
-      catch (e) {
-        console.log(`Socket ${socket.id} unauthorized.`);
-        return callback({ message: 'UNAUTHORIZED' });
-      }    
+      socket.user = user;
+      return callback(null, true);
+    }
+    catch (e) {
+      console.log(`Socket ${socket.id} unauthorized.`);
+      return callback({ message: 'UNAUTHORIZED' });
+    }    
     },
     postAuthenticate: socket => {
       console.log(`Socket ${socket.id} authenticated.`);
@@ -52,18 +54,12 @@ socketAuth, (io, {
       console.log(`Socket ${socket.id} disconnected.`);
     }
   });
-  
-io.on('connection', function(socket){
-  socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
-    console.log('message: ' + msg);
+  io.on('connection', socket =>{
+    socket.on('chat message', msg => {
+      io.of('/').in(gameId).emit('chat message', msg);
+      //Incluir guardar chat en la BBDD
+    });
   });
-
-  socket.on('disconnect', function(){
-    console.log(`User disconnected: ${socket.id}`);
-  });
-
-});
 
 /**
  * Listen on provided port, on all network interfaces.

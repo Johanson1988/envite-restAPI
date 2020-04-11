@@ -59,7 +59,20 @@ const connect = () => {
     statusInput.value = 'Connected';
     connectButton.disabled = true;
     disconnectButton.disabled = false;
+
+    socket.emit('authentication', {
+      _id: tokenInput.value,
+    });
   });
+
+  socket.on('unauthorized', (reason) => {
+    console.log('Unauthorized:', reason);
+
+    error = reason.message;
+
+    socket.disconnect();
+  });
+
 
   socket.on('disconnect', (reason) => {
     console.log(`Disconnected: ${reason}`);
