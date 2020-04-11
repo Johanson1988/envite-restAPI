@@ -41,7 +41,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-      const socketUrl = 'http://localhost:3000';
+      const socketUrl = 'http://localhost:5000';
 
 let connectButton;
 let disconnectButton;
@@ -50,6 +50,8 @@ let statusInput;
 let tokenInput;
 
 const connect = () => {
+  let error = null;
+
   socket = io(socketUrl, {
     autoConnect: false,
   });
@@ -59,28 +61,28 @@ const connect = () => {
     statusInput.value = 'Connected';
     connectButton.disabled = true;
     disconnectButton.disabled = false;
+    
+    socket.emit('authentication', {
+      token: tokenInput.value,
+    });
+  });
+
+  socket.on('unauthorized', reason => {
+    console.log('Unauthorized:', reason);
+    error = reason.message;
+    socket.disconnect();
   });
 
   socket.on('disconnect', (reason) => {
-    console.log(`Disconnected: ${reason}`);
-    statusInput.value = `Disconnected: ${reason}`;
+    console.log(`Disconnected: ${error || reason}`);
+    statusInput.value = `Disconnected: ${error || reason}`;
     connectButton.disabled = false;
     disconnectButton.disabled = true;
-  })
-
-  socket.on('chat message', function(msg){
-      $('#messages').append($('<li>').text(msg));
-    });
+    error = null;
+  });
 
   socket.open();
 };
-
-const disconnect = () => {
-  socket.disconnect();
-}
-
-
-
 /*socket.on('players list', function(msg){
     console.log('Jugadores online: ' + msg);
   }); */

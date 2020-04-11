@@ -13,7 +13,7 @@ var http = require('http');
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || '5000');
 app.set('port', port);
 
 /**
@@ -21,32 +21,61 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
-var io = require('socket.io')(server);
+var io = require('socket.io')();
 const socketAuth = require('socketio-auth');
+
+io.attach(server);
 
 const gameId = 'dummyGameId';
 
-io.on('connection', function(socket){
-  console.log(`User connected: ${socket.id}`);
-  socket.join(gameId);
+async function verifyUser (_id) { 
+  new Promise((resolve, reject) => {
+    const User = require('./../models/User');
+    return User.findOne({_id})
+    .then(userFound => resolve(userFound))
+    .catch( _ => reject('USER_NOT_FOUND'));
+  })
+};
 
-  io.of('/').in(gameId).clients((error, data)=> {
-    if (error) throw error;
-    const namesList = data.map(player =>io.sockets.connected[player].id);  
-    io.of('/').in(gameId).emit('send-list-of-players',namesList);  
-    console.log('Lista de jugadores: ', namesList);
-  });
-
-  socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
-    console.log('message: ' + msg);
-  });
-
-  socket.on('disconnect', function(){
-    console.log(`User disconnected: ${socket.id}`);
-  });
-
+socketAuth, (io, {  
+  authenticate: async (socket, data, callback) => {
+    const { _id } = data;
+    
+    try {
+      const user = await verifyUser(_id);
+      console.log('*       Intento de conexion         *');
+      socket.user = user;
+      return callback(null, true);
+    }
+    catch (e) {
+      console.log(`Socket ${socket.id} unauthorized.`);
+      return callback({ message: 'UNAUTHORIZED' });
+    }    
+  },
+  postAuthenticate: socket => {
+    console.log(`Socket ${socket.id} authenticated.`);
+    socket.join(gameId);
+  },
+  disconnect: socket => {
+    console.log(`Socket ${socket.id} disconnected.`);
+  }
 });
+
+
+/*io.of('/').in(gameId).clients((error, data)=> {
+  if (error) throw error;
+  const namesList = data.map(player =>io.sockets.connected[player].id);  
+  io.of('/').in(gameId).emit('send-list-of-players', namesList);  
+  console.log('Lista de jugadores: ', namesList);
+});
+
+io.on('chat message', function(msg){
+  io.emit('chat message', msg);
+  console.log('message: ' + msg);
+});
+
+*/
+
 
 /**
  * Listen on provided port, on all network interfaces.

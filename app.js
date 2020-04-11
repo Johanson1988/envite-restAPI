@@ -6,7 +6,8 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-//const cors = require('cors');
+const createError = require('http-errors');
+const cors = require('cors');
 require('dotenv').config();
 
 // EXPRESS SERVER INSTANCE
@@ -22,6 +23,14 @@ mongoose
   })
   .then( () => console.log(`Connected to database`))
   .catch( (err) => console.error(err));
+
+// CORS MIDDLEWARE SETUP
+app.use(
+  cors({
+    credentials: true,
+    origin: [process.env.PUBLIC_DOMAIN,'http://127.0.0.1:5000'],
+  }),
+);
 
 // SESSION MIDDLEWARE
 app.use(
