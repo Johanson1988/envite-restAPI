@@ -20,30 +20,26 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
-var io = require('socket.io')();
+const server = http.createServer(app);
+const io = require('socket.io')(server);
 const socketAuth = require('socketio-auth');
 
 io.attach(server);
 
 const gameId = 'dummyGameId';
 
-async function verifyUser (_id) { 
-  new Promise((resolve, reject) => {
-    const User = require('./../models/User');
+const verifyUser = _id => new Promise((resolve, reject) => {
+    const User = require('./../models/Player');
     return User.findOne({_id})
     .then(userFound => resolve(userFound))
     .catch( _ => reject('USER_NOT_FOUND'));
   })
-};
 
-socketAuth, (io, {  
+socketAuth (io, {  
   authenticate: async (socket, data, callback) => {
     const { _id } = data;
-    
     try {
       const user = await verifyUser(_id);
-      console.log('*       Intento de conexion         *');
       socket.user = user;
       return callback(null, true);
     }
@@ -51,31 +47,23 @@ socketAuth, (io, {
       console.log(`Socket ${socket.id} unauthorized.`);
       return callback({ message: 'UNAUTHORIZED' });
     }    
-  },
-  postAuthenticate: socket => {
-    console.log(`Socket ${socket.id} authenticated.`);
-    socket.join(gameId);
-  },
-  disconnect: socket => {
-    console.log(`Socket ${socket.id} disconnected.`);
-  }
-});
-
-
-/*io.of('/').in(gameId).clients((error, data)=> {
-  if (error) throw error;
-  const namesList = data.map(player =>io.sockets.connected[player].id);  
-  io.of('/').in(gameId).emit('send-list-of-players', namesList);  
-  console.log('Lista de jugadores: ', namesList);
-});
-
-io.on('chat message', function(msg){
-  io.emit('chat message', msg);
-  console.log('message: ' + msg);
-});
-
-*/
-
+    },
+    postAuthenticate: socket => {
+      console.log(`Socket ${socket.id} authenticated.`);
+      socket.join(gameId);
+    },
+    disconnect: socket => {
+      console.log(`Socket ${socket.id} disconnected.`);
+    }
+  });
+  io.on('connection', socket =>{
+    socket.on('chat message', msg => {
+      io.emit('chat message', msg);
+      //poner chats por gameId
+      //io.of('/').in(gameId).emit('chat message', msg);
+      //Incluir guardar chat en la BBDD
+    });
+  });
 
 /**
  * Listen on provided port, on all network interfaces.
