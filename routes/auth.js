@@ -50,7 +50,7 @@ router.post('/signup', isNotLoggedIn, validationLoggin, async (req, res, next) =
       const newUser = await User.create({username, password: hashPass });
       req.session.currentUser = newUser;
       res
-        .status(200)  //  OK
+        .status(202)  //  OK
         .json(newUser);
     }
   } 
