@@ -27,7 +27,7 @@ const socketAuth = require('socketio-auth');
 const gameId = 'dummyGameId';
 
 const verifyUser = _id => new Promise((resolve, reject) => {
-    const User = require('./../models/Player');
+    const User = require('../models/User');
     return User.findOne({_id})
     .then(userFound => resolve(userFound))
     .catch( _ => reject('USER_NOT_FOUND'));
