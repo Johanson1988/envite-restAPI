@@ -23,8 +23,6 @@ const server = http.createServer(app);
 const io = require('socket.io')(server);
 const socketAuth = require('socketio-auth');
 
-const gameId = 'dummyGameId';
-
 const verifyUser = _id => new Promise((resolve, reject) => {
     const User = require('../models/User');
     return User.findOne({_id})
@@ -34,10 +32,12 @@ const verifyUser = _id => new Promise((resolve, reject) => {
 
 socketAuth (io, {  
   authenticate: async (socket, data, callback) => {
-    const { _id } = data;
+    const { _id, gameId } = data;
     try {
       const user = await verifyUser(_id);
+      //comprobar que el gameId existe
       socket.user = user;
+      socket.gameId = gameId;
       return callback(null, true);
     }
     catch (e) {
@@ -47,7 +47,8 @@ socketAuth (io, {
     },
     postAuthenticate: socket => {
       console.log(`Socket ${socket.id} authenticated.`);
-      socket.join(gameId);
+      console.log(socket.gameId);
+      socket.join(socket.gameId);
     },
     disconnect: socket => {
       console.log(`Socket ${socket.id} disconnected.`);
