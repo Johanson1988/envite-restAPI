@@ -43,14 +43,14 @@ router.post('/signup', isNotLoggedIn, validationLoggin, async (req, res, next) =
   try {
     const usernameExists = await User.findOne({ username }, 'username');
     
-    if (usernameExists) return next(createError(400));
+    if (usernameExists) return next(createError(422));
     else {
       const salt = bcrypt.genSaltSync(saltRounds);
       const hashPass = bcrypt.hashSync(password, salt);
       const newUser = await User.create({username, password: hashPass });
       req.session.currentUser = newUser;
       res
-        .status(202)  //  OK
+        .status(201)  //  OK
         .json(newUser);
     }
   } 
