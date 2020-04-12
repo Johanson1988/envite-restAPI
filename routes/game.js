@@ -6,7 +6,7 @@ router.post('/', (req, res, next) => {
     const { roundtime, numberOfPlayers } = req.body;
     const createdBy = req.session.currentUser._id;
     const gameStatus = 'waitingForPlayers';
-    console.log(roundtime, numberOfPlayers, createdBy, gameStatus);
+
     Game.create({roundtime, numberOfPlayers, createdBy, gameStatus})
         .then( newGame => {
             const { _id } = newGame;
