@@ -9,8 +9,7 @@ router.post('/', (req, res, next) => {
 
     Game.create({roundtime, numberOfPlayers, createdBy, gameStatus})
         .then( newGame => {
-            const { _id } = newGame;
-            res.status(201).json(_id);
+            res.status(201).json(newGame);
         })
         .catch(err => res.status(422).send());
 });
