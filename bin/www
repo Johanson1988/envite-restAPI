@@ -64,6 +64,8 @@ socketAuth (io, {
   io.on('connection', socket =>{
     socket.on('chat message', msg => {
       const {username} = socket.user;
+      (socket.user.sentMessages = socket.user.sentMessages || []).push({msg,date:Date.now()});
+      console.log(socket.user.sentMessages);
       io.to(socket.game._id).emit('chat message', msg, username);
     });
 
