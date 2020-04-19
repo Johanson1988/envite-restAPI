@@ -31,11 +31,18 @@
       <input type="text" id="gameId" name="gameId" value="5e9355f0e961713428dbb832" />
     </p>
     <p>
+      <label for="seat">seat: </label>
+      <input type="number" id="seat" name="seat" value=0 />
+    </p>
+    <p>
       <button id="connect" onclick="connect()">
         Connect
       </button>
       <button id="disconnect" onclick="disconnect()" disabled>
         Disconnect
+      </button>
+      <button id="connect" onclick="sendSeat()">
+        Enviar Sitio
       </button>
     </p>
     <ul id="messages"></ul>
@@ -53,6 +60,7 @@ var socket;
 let statusInput;
 let tokenInput;
 let gameIdInput;
+let seatInput;
 
 const connect = () => {
   socket = io(socketUrl, {
@@ -87,6 +95,8 @@ const connect = () => {
     disconnectButton.disabled = true;
   })
 
+
+
   socket.on('chat message', (msg, username) => {    
       $('#messages').append($('<li>').text(`${username}::: ${msg}`));
     });
@@ -98,6 +108,11 @@ const disconnect = () => {
   socket.disconnect();
 }
 
+const sendSeat = _ => {
+    console.log('Sitio enviado');
+    const seat = seatInput.value;
+    socket.emit('new-seat', seat, (success) => console.log(success));
+  }
 
 
 /*socket.on('players list', function(msg){
@@ -123,6 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
   statusInput = document.getElementById('status');
   tokenInput = document.getElementById('token');
   gameIdInput = document.getElementById('gameId');
+  seatInput = document.getElementById('seat');
 });
 
     </script>
