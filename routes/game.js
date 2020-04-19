@@ -16,7 +16,7 @@ router.post('/', (req, res, next) => {
 
 router.get('/', (req, res, next) => {
     const Game = require('./../models/Game');
-    const { _id } = req.params;
+    const { _id } = req.query;
 
     Game.findOne({_id})
         .then(gameFound => {
