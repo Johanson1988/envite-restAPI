@@ -28,16 +28,23 @@ const verifyUser = _id => new Promise((resolve, reject) => {
     return User.findOne({_id})
     .then(userFound => resolve(userFound))
     .catch( _ => reject('USER_NOT_FOUND'));
-  })
+  });
+
+  const verifyGame = _id => new Promise((resolve, reject) => {
+    const Game = require('../models/Game');
+    return Game.findOne({_id})
+    .then(gameFound => resolve(gameFound))
+    .catch( _ => reject('GAME_NOT_FOUND'));
+  });
 
 socketAuth (io, {  
   authenticate: async (socket, data, callback) => {
     const { _id, gameId } = data;
     try {
       const user = await verifyUser(_id);
-      //comprobar que el gameId existe
+      const game = await verifyGame(gameId);
       socket.user = user;
-      socket.gameId = gameId;
+      socket.game = game;
       return callback(null, true);
     }
     catch (e) {
@@ -47,8 +54,7 @@ socketAuth (io, {
     },
     postAuthenticate: socket => {
       console.log(`Socket ${socket.id} authenticated.`);
-      console.log(socket.gameId);
-      socket.join(socket.gameId);
+      socket.join(socket.game._id);
     },
     disconnect: socket => {
       console.log(`Socket ${socket.id} disconnected.`);
@@ -56,11 +62,24 @@ socketAuth (io, {
   });
   io.on('connection', socket =>{
     socket.on('chat message', msg => {
-      io.emit('chat message', msg);
-      //poner chats por gameId
-      //io.of('/').in(gameId).emit('chat message', msg);
-      //Incluir guardar chat en la BBDD
+      const {username} = socket.user;
+      console.log(`${username}::${msg}`)
+      io.to(socket.game._id).emit('chat message', msg, username);
     });
+
+    socket.on('new-seat', (seat, success) => {
+        const player = socket.user;
+        const game = socket.game;
+        //TODO añadir comprobar que la posición es menor que el numero máximo de jugadores
+        if (typeof seat == integer && !game.table[seat]) {
+          //const userAlreadySeated = game.table.find(playerId => playerId == player._id);
+          //if (userAlreadySeated) socket.game.table[i]
+          game.table[seat] = player._id;
+          success(true);
+          //emitir nuevo objeto juego actualizado
+        }          
+        else success(false);
+    })
   });
 
 /**

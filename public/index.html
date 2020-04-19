@@ -24,7 +24,11 @@
     </p>
     <p>
       <label for="token">My Token: </label>
-      <input type="text" id="token" name="token" value="secret token" />
+      <input type="text" id="token" name="token" value="5e8cc9ab8c2a3546f046ebe9" />
+    </p>
+    <p>
+      <label for="gameId">GameId: </label>
+      <input type="text" id="gameId" name="gameId" value="5e9355f0e961713428dbb832" />
     </p>
     <p>
       <button id="connect" onclick="connect()">
@@ -48,6 +52,7 @@ let disconnectButton;
 var socket;
 let statusInput;
 let tokenInput;
+let gameIdInput;
 
 const connect = () => {
   socket = io(socketUrl, {
@@ -62,7 +67,7 @@ const connect = () => {
 
     socket.emit('authentication', {
       _id: tokenInput.value,
-      gameId: '5e9355f0e961713428dbb832'
+      gameId: gameIdInput.value
     });
   });
 
@@ -82,8 +87,8 @@ const connect = () => {
     disconnectButton.disabled = true;
   })
 
-  socket.on('chat message', function(msg){
-      $('#messages').append($('<li>').text(msg));
+  socket.on('chat message', (msg, username) => {    
+      $('#messages').append($('<li>').text(`${username}::: ${msg}`));
     });
 
   socket.open();
@@ -117,9 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
   disconnectButton = document.getElementById('disconnect');
   statusInput = document.getElementById('status');
   tokenInput = document.getElementById('token');
+  gameIdInput = document.getElementById('gameId');
 });
-
-
 
     </script>
   </body>
