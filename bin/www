@@ -54,6 +54,7 @@ socketAuth (io, {
     },
     postAuthenticate: socket => {
       console.log(`Socket ${socket.id} authenticated.`);
+      //TODO comprobar que el usuario no está ya en la mesa
       socket.join(socket.game._id);
     },
     disconnect: socket => {
@@ -76,8 +77,7 @@ socketAuth (io, {
         console.log('mesa:', game.table);
         console.log('tipo sitio', typeof seat);
         console.log('sitiomesa:',game.table[seat]);
-        //TODO añadir comprobar que la posición es menor que el numero máximo de jugadores
-        if (typeof seat === 'number' && !game.table[seat]) {
+        if (typeof seat === 'number' && !game.table[seat] && seat < game.numberOfPlayers && seat >= 0) {
           if (user.seat || user.seat === 0) game.table[user.seat] = null;
           game.table[seat] = user._id;
           user.seat = seat;
@@ -85,7 +85,14 @@ socketAuth (io, {
           socket.game = game;
           socket.user = user;
           success(true);
-          //emitir nuevo objeto juego actualizado
+          io.of('/').in(game._id).clients((error, data)=> {
+            if (error) throw error;
+            data.forEach(client => {
+              console.log('mesa vieja', io.sockets.connected[client].game.table);
+              io.sockets.connected[client].game.table = game.table;
+              console.log('mesa nueva', io.sockets.connected[client].game.table);
+            });
+          });
         }          
         else success(false);
     })
