@@ -64,7 +64,6 @@ socketAuth (io, {
   io.on('connection', socket =>{
     socket.on('chat message', msg => {
       const {username} = socket.user;
-      console.log(`${username}::${msg}`)
       io.to(socket.game._id).emit('chat message', msg, username);
     });
 
@@ -73,26 +72,17 @@ socketAuth (io, {
         const user = socket.user;
         const game = socket.game;
 
-
-        console.log('mesa:', game.table);
-        console.log('tipo sitio', typeof seat);
-        console.log('sitiomesa:',game.table[seat]);
         if (typeof seat === 'number' && !game.table[seat] && seat < game.numberOfPlayers && seat >= 0) {
           if (user.seat || user.seat === 0) game.table[user.seat] = null;
           game.table[seat] = user._id;
           user.seat = seat;
-          console.log('Mesa Nueva: ',game.table);
+
           socket.game = game;
           socket.user = user;
           success(true);
           io.of('/').in(game._id).clients((error, data)=> {
             if (error) throw error;
-            data.forEach(client => {
-              console.log('mesa vieja', io.sockets.connected[client].game.table);
-              io.sockets.connected[client].game.table = game.table;
-              //emitir mesa a
-              console.log('mesa nueva', io.sockets.connected[client].game.table);
-            });
+            data.forEach(client => io.sockets.connected[client].game.table = game.table);
             io.to(socket.game._id).emit('new-player-seated', game);
           });
         }          
