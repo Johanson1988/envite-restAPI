@@ -69,19 +69,21 @@ socketAuth (io, {
 
     socket.on('new-seat', (seat, success) => {
         seat = parseInt(seat);
-        const player = socket.user;
+        const user = socket.user;
         const game = socket.game;
-        const {table} = game;
 
-        console.log('mesa:', table);
+
+        console.log('mesa:', game.table);
         console.log('tipo sitio', typeof seat);
-        console.log('sitiomesa:',table[seat]);
+        console.log('sitiomesa:',game.table[seat]);
         //TODO añadir comprobar que la posición es menor que el numero máximo de jugadores
         if (typeof seat === 'number' && !game.table[seat]) {
-          //const userAlreadySeated = game.table.find(playerId => playerId == player._id);
-          //if (userAlreadySeated) socket.game.table[i]
-          game.table[seat] = player._id;
-          console.log(game.table);
+          if (user.seat || user.seat === 0) game.table[user.seat] = null;
+          game.table[seat] = user._id;
+          user.seat = seat;
+          console.log('Mesa Nueva: ',game.table);
+          socket.game = game;
+          socket.user = user;
           success(true);
           //emitir nuevo objeto juego actualizado
         }          
