@@ -101,6 +101,8 @@ const connect = () => {
       $('#messages').append($('<li>').text(`${username}::: ${msg}`));
     });
 
+    socket.on('new-player-seated', game => console.log(game.table));
+
   socket.open();
 };
 

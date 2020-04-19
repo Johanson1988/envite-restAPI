@@ -90,8 +90,10 @@ socketAuth (io, {
             data.forEach(client => {
               console.log('mesa vieja', io.sockets.connected[client].game.table);
               io.sockets.connected[client].game.table = game.table;
+              //emitir mesa a
               console.log('mesa nueva', io.sockets.connected[client].game.table);
             });
+            io.to(socket.game._id).emit('new-player-seated', game);
           });
         }          
         else success(false);
