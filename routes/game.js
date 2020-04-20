@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-router.post('/', (req, res, next) => {
+// HELPER FUNCTIONS
+const { isLoggedIn } = require('./../helpers/middleware');
+
+router.post('/', isLoggedIn, (req, res, next) => {
     const Game = require('./../models/Game');
     const { roundTime, numberOfPlayers } = req.body;
     const createdBy = req.session.currentUser._id;
@@ -14,7 +17,7 @@ router.post('/', (req, res, next) => {
         .catch(err => res.status(422).send());
 });
 
-router.get('/', (req, res, next) => {
+router.get('/', isLoggedIn, (req, res, next) => {
     const Game = require('./../models/Game');
     const { _id } = req.query;
 
