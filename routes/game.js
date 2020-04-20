@@ -3,11 +3,11 @@ const router = express.Router();
 
 router.post('/', (req, res, next) => {
     const Game = require('./../models/Game');
-    const { roundtime, numberOfPlayers } = req.body;
+    const { roundTime, numberOfPlayers } = req.body;
     const createdBy = req.session.currentUser._id;
     const gameStatus = 'waitingForPlayers';
 
-    Game.create({roundtime, numberOfPlayers, createdBy, gameStatus})
+    Game.create({roundTime, numberOfPlayers, createdBy, gameStatus})
         .then( newGame => {
             res.status(201).json(newGame);
         })
