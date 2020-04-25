@@ -93,10 +93,18 @@ socketAuth (io, {
 
     socket.on('start-game', (success) => {
       const {game} = socket;
+      success = () => {
+        if (game.numberOfPlayers != game.table.length) return false;
+        if (game.teamA.length != game.teamB.length) return false;
+        game.gameStatus = 'Running';
+
+      }
+
       console.log(game);
-      //
+      
       //cambiar estado a running
       //escribir juego a base de datos
+      //barajar cartas
     })
   });
 
