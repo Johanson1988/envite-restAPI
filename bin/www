@@ -56,12 +56,13 @@ socketAuth (io, {
       console.log(`Socket ${socket.id} authenticated.`);
       //TODO comprobar que el usuario no está ya en la mesa
       socket.join(socket.game._id);
+      io.to(socket.id).emit('send-game-data', socket.game);
     },
     disconnect: socket => {
       console.log(`Socket ${socket.id} disconnected.`);
     }
   });
-  io.on('connection', socket =>{
+  io.on('connection', socket => {
     socket.on('chat message', msg => {
       const {username} = socket.user;
       (socket.user.sentMessages = socket.user.sentMessages || []).push({msg,date:Date.now()});
@@ -85,7 +86,6 @@ socketAuth (io, {
             if (error) throw error;
             data.forEach(client => io.sockets.connected[client].game.table = game.table);
             io.to(socket.game._id).emit('new-player-seated', game);
-            console.log('Juego', game)
           });
         }          
         else success(false);
@@ -94,6 +94,9 @@ socketAuth (io, {
     socket.on('start-game', (success) => {
       const {game} = socket;
       console.log(game);
+      //
+      //cambiar estado a running
+      //escribir juego a base de datos
     })
   });
 

@@ -44,7 +44,7 @@
       <button id="connect" onclick="sendSeat()">
         Enviar Sitio
       </button>
-      <button id="start-game" onclick="startGame()">
+      <button id="start-game">
         Comenzar juego
       </button>
     </p>
@@ -71,7 +71,7 @@ const connect = () => {
   });
 
   socket.on('connect', () => {
-    console.log('Connected');
+    console.log('Connected', socket);
     statusInput.value = 'Connected';
     connectButton.disabled = true;
     disconnectButton.disabled = false;
@@ -96,9 +96,9 @@ const connect = () => {
     statusInput.value = `Disconnected: ${reason}`;
     connectButton.disabled = false;
     disconnectButton.disabled = true;
-  })
+  });
 
-
+  socket.on('send-game-data', message => console.log(message));
 
   socket.on('chat message', (msg, username) => {    
       $('#messages').append($('<li>').text(`${username}::: ${msg}`));
@@ -138,7 +138,7 @@ const  startGame = document.querySelector('#start-game');
 
 startGame.addEventListener('click', e => {
   e.preventDefault();
-  socket.emit('start-game', (success));
+  socket.emit('start-game');
   console.log('Juego comenzado');
 })
 
