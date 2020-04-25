@@ -44,6 +44,9 @@
       <button id="connect" onclick="sendSeat()">
         Enviar Sitio
       </button>
+      <button id="start-game" onclick="startGame()">
+        Comenzar juego
+      </button>
     </p>
     <ul id="messages"></ul>
     <form action="">
@@ -131,7 +134,13 @@ botonEnviar.addEventListener('click', e => {
   console.log('enviado', e);
 })
 
+const  startGame = document.querySelector('#start-game');
 
+startGame.addEventListener('click', e => {
+  e.preventDefault();
+  socket.emit('start-game', (success));
+  console.log('Juego comenzado');
+})
 
 
 document.addEventListener('DOMContentLoaded', () => {

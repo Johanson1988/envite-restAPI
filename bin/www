@@ -75,7 +75,7 @@ socketAuth (io, {
 
         if (typeof seat === 'number' && !game.table[seat] && seat < game.numberOfPlayers && seat >= 0) {
           if (user.seat || user.seat === 0) game.table[user.seat] = null;
-          game.table[seat] = user._id;
+          game.table[seat] = {id: user._id, nickname: user.username};
           user.seat = seat;
 
           socket.game = game;
@@ -85,9 +85,15 @@ socketAuth (io, {
             if (error) throw error;
             data.forEach(client => io.sockets.connected[client].game.table = game.table);
             io.to(socket.game._id).emit('new-player-seated', game);
+            console.log('Juego', game)
           });
         }          
         else success(false);
+    });
+
+    socket.on('start-game', (success) => {
+      const {game} = socket;
+      console.log(game);
     })
   });
 
