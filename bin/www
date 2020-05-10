@@ -53,14 +53,13 @@ socketAuth (io, {
       return callback({ message: 'UNAUTHORIZED' });
     }    
     },
-    postAuthenticate: async socket => {
+    postAuthenticate: socket => {
       console.log(`Socket ${socket.id} authenticated.`);
       //TODO comprobar que el usuario no está ya en la mesa
       socket.join(socket.game._id);
       const { getUpdatedGame, sendGameData } = require('./../helpers/helpers');      
-      socket.game = await getUpdatedGame(io, socket);
-      console.log('After udpating game', socket.game);
-      await sendGameData(io, socket);
+      socket.game = getUpdatedGame(io, socket);
+      sendGameData(io, socket);
     },
     disconnect: socket => {
       console.log(`Socket ${socket.id} disconnected.`);
@@ -92,7 +91,6 @@ socketAuth (io, {
           socket.user = user;
           socket.game = game;
           sendGameData(io, socket);
-          console.log('Datos enviados');
         }          
         else success(false);
     });
@@ -101,7 +99,6 @@ socketAuth (io, {
       const Game = require('./../models/Game');
       const { checkGameReady, setGameStatus, sendGameData } = require('./../helpers/helpers');
       let {game} = socket;
-      console.log(game.table.length);
       if (!checkGameReady(game)) success = false;
       else {
         console.log('Succes');
