@@ -104,8 +104,6 @@ const connect = () => {
       $('#messages').append($('<li>').text(`${username}::: ${msg}`));
     });
 
-    socket.on('new-player-seated', game => console.log(game.table));
-
   socket.open();
 };
 
@@ -138,7 +136,7 @@ const  startGame = document.querySelector('#start-game');
 
 startGame.addEventListener('click', e => {
   e.preventDefault();
-  socket.emit('start-game');
+  socket.emit('start-game', (success) => console.log(success));
   console.log('Juego comenzado');
 })
 

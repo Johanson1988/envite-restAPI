@@ -8,7 +8,7 @@ const gameSchema = new Schema({
     loosers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Player' }],
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Player', required: true},
     gamesToWin: { type: Number},
-    gameStatus: { type:String, enum:['waitingForPlayers','Running','Finished' ], required: true},
+    gameStatus: { type:String, enum:['waitingForPlayers', 'Ready','Running','Finished' ], required: true},
     chatLog: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ChatMessage' }],
     scoreTeamA: [{ type: Number }],
     scoreTeamB: [{ type: Number }],

@@ -85,22 +85,32 @@ socketAuth (io, {
           io.of('/').in(game._id).clients((error, data)=> {
             if (error) throw error;
             data.forEach(client => io.sockets.connected[client].game.table = game.table);
-            io.to(socket.game._id).emit('new-player-seated', game);
+            io.to(socket.id).emit('send-game-data', socket.game);
+            
           });
         }          
         else success(false);
     });
 
     socket.on('start-game', (success) => {
+      const Game = require('./../models/Game');
       const {game} = socket;
-      success = () => {
-        if (game.numberOfPlayers != game.table.length) return false;
-        if (game.teamA.length != game.teamB.length) return false;
-        game.gameStatus = 'Running';
+      console.log(game.table.length);
+      if (/*game.numberOfPlayers != game.table.length /*|| game.teamA.length != game.teamB.length ||*/ game.status ==! 'waitingForPlayers') success = false;
+      else {
+        console.log('Succes');
+        success = true;
+        console.log(game._id);
+        Game.findOneAndUpdate({_id:game._id},{returnNewDocument: true})
+          .then(gameUpdated => gameUpdated)
+          .catch(error => console.error(error));
 
-      }
+      }  
+        
+        
+      
 
-      console.log(game);
+      console.log(success);
       
       //cambiar estado a running
       //escribir juego a base de datos
