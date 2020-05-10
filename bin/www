@@ -78,7 +78,12 @@ socketAuth (io, {
         const game = socket.game;
 
         if (typeof seat === 'number' && game.table[seat] === undefined && seat < game.numberOfPlayers && seat >= 0) {
-          if (user.seat || user.seat === 0) game.table[user.seat] = null;
+          if (user.seat || user.seat === 0) {
+            game.table[user.seat] = null;
+            user.seat % 2 === 0 || seat === 0 ?
+               delete game.teamA[game.teamA.findIndex(player => player === user._id)]:
+               delete game.teamB[game.teamB.findIndex(player => player === user._id)];  
+          };
           game.table[seat] = {id: user._id, nickname: user.username};
           seat % 2 === 0 || seat === 0 ?
             game.teamA.push(user._id) :
