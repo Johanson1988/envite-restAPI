@@ -48,15 +48,19 @@ socketAuth (io, {
       return callback(null, true);
     }
     catch (e) {
+      console.log(e);
       console.log(`Socket ${socket.id} unauthorized.`);
       return callback({ message: 'UNAUTHORIZED' });
     }    
     },
-    postAuthenticate: socket => {
+    postAuthenticate: async socket => {
       console.log(`Socket ${socket.id} authenticated.`);
       //TODO comprobar que el usuario no está ya en la mesa
       socket.join(socket.game._id);
-      io.to(socket.id).emit('send-game-data', socket.game);
+      const { getUpdatedGame, sendGameData } = require('./../helpers/helpers');      
+      socket.game = await getUpdatedGame(io, socket);
+      console.log('After udpating game', socket.game);
+      await sendGameData(io, socket);
     },
     disconnect: socket => {
       console.log(`Socket ${socket.id} disconnected.`);
@@ -74,37 +78,40 @@ socketAuth (io, {
         const user = socket.user;
         const game = socket.game;
 
-        if (typeof seat === 'number' && !game.table[seat] && seat < game.numberOfPlayers && seat >= 0) {
+        if (typeof seat === 'number' && game.table[seat] === undefined && seat < game.numberOfPlayers && seat >= 0) {
           if (user.seat || user.seat === 0) game.table[user.seat] = null;
           game.table[seat] = {id: user._id, nickname: user.username};
+          seat % 2 === 0 || seat === 0 ?
+            game.teamA.push(user._id) :
+            game.teamB.push(user._id);
           user.seat = seat;
-
-          socket.game = game;
-          socket.user = user;
           success(true);
-          io.of('/').in(game._id).clients((error, data)=> {
-            if (error) throw error;
-            data.forEach(client => io.sockets.connected[client].game.table = game.table);
-            io.to(socket.id).emit('send-game-data', socket.game);
-            
-          });
+          const { sendGameData, checkGameReady } = require('./../helpers/helpers');
+
+          checkGameReady(game) ? game.status = 'Ready' : null;
+          socket.user = user;
+          socket.game = game;
+          sendGameData(io, socket);
+          console.log('Datos enviados');
         }          
         else success(false);
     });
 
     socket.on('start-game', (success) => {
       const Game = require('./../models/Game');
-      const {game} = socket;
+      const { checkGameReady, setGameStatus, sendGameData } = require('./../helpers/helpers');
+      let {game} = socket;
       console.log(game.table.length);
-      if (/*game.numberOfPlayers != game.table.length /*|| game.teamA.length != game.teamB.length ||*/ game.status ==! 'waitingForPlayers') success = false;
+      if (!checkGameReady(game)) success = false;
       else {
         console.log('Succes');
         success = true;
         console.log(game._id);
-        Game.findOneAndUpdate({_id:game._id},{returnNewDocument: true})
-          .then(gameUpdated => gameUpdated)
-          .catch(error => console.error(error));
-
+        game = setGameStatus(game, 'Running');
+        sendGameData(game);
+        //Game.findOneAndUpdate({_id:game._id},{returnNewDocument: true})
+          //.then(gameUpdated => gameUpdated)
+          //.catch(error => console.error(error));
       }  
         
         
