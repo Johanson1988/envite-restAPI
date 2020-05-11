@@ -28,7 +28,7 @@
     </p>
     <p>
       <label for="gameId">GameId: </label>
-      <input type="text" id="gameId" name="gameId" value="5e9355f0e961713428dbb832" />
+      <input type="text" id="gameId" name="gameId" value="5eb981b620e4043c448d8b07" />
     </p>
     <p>
       <label for="seat">seat: </label>
@@ -46,6 +46,9 @@
       </button>
       <button id="start-game">
         Comenzar juego
+      </button>
+      <button id="stop-game">
+        Parar juego
       </button>
     </p>
     <ul id="messages"></ul>
@@ -140,6 +143,13 @@ startGame.addEventListener('click', e => {
   console.log('Juego comenzado');
 })
 
+const  stopGame = document.querySelector('#stop-game');
+
+stopGame.addEventListener('click', e => {
+  e.preventDefault();
+  socket.emit('stop-game', (success) => console.log(success));
+  console.log('Juego terminado');
+})
 
 document.addEventListener('DOMContentLoaded', () => {
   connectButton = document.getElementById('connect');

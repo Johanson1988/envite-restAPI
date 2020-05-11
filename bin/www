@@ -77,7 +77,7 @@ socketAuth (io, {
         const user = socket.user;
         const game = socket.game;
 
-        if (typeof seat === 'number' && game.table[seat] === undefined && seat < game.numberOfPlayers && seat >= 0) {
+        if (typeof seat === 'number' && !game.table[seat] && seat < game.numberOfPlayers && seat >= 0) {
           if (user.seat || user.seat === 0) {
             game.table[user.seat] = null;
             user.seat % 2 === 0 || seat === 0 ?
@@ -92,7 +92,7 @@ socketAuth (io, {
           success(true);
           const { sendGameData, checkGameReady } = require('./../helpers/helpers');
 
-          checkGameReady(game) ? game.status = 'Ready' : null;
+          checkGameReady(game) ? game.gameStatus = 'Ready' : null;
           socket.user = user;
           socket.game = game;
           sendGameData(io, socket);
@@ -100,26 +100,40 @@ socketAuth (io, {
         else success(false);
     });
 
-    socket.on('start-game', (success) => {
+    socket.on('stop-game', _ => {
+      socket.game.gameStatus = 'WaitingForPlayers';
+      console.log('Juego terminado', socket.game.gameStatus);
+    });
+
+    socket.on('start-game', async(success) => {
+      console.log('Iniciar juego');
       const Game = require('./../models/Game');
-      const { checkGameReady, setGameStatus, sendGameData } = require('./../helpers/helpers');
+      const { checkGameReady, sendGameData } = require('./../helpers/helpers');
       let {game} = socket;
-      if (!checkGameReady(game)) success = false;
+      console.log(game);
+      if (checkGameReady(game) === false) success(false);
       else {
-        console.log('Succes');
-        success = true;
-        console.log(game._id);
-        game = setGameStatus(game, 'Running');
-        sendGameData(game);
-        //Game.findOneAndUpdate({_id:game._id},{returnNewDocument: true})
-          //.then(gameUpdated => gameUpdated)
-          //.catch(error => console.error(error));
+        game.gameStatus = 'Running';
+        sendGameData(io,socket);
+        try {
+          console.log(game);
+          let {teamA, teamB, table, gameStatus} = game;
+          table = table.map(player => player.id);
+          console.log(table);
+
+          //const savedGame = await Game.findOneAndUpdate({ _id:game._id },{ teamA, teamB, table, gameStatus },{returnNewDocument: true});
+          //console.log('Juego salvado',savedGame);
+        }
+        catch (e) {
+          console.error(e);
+          success(false);
+          game.gameStatus = 'WaitingForPlayers';
+        }
+        
+        success(true);
+
       }  
         
-        
-      
-
-      console.log(success);
       
       //cambiar estado a running
       //escribir juego a base de datos

@@ -9,8 +9,9 @@ router.post('/', isLoggedIn, (req, res, next) => {
     const { roundTime, numberOfPlayers } = req.body;
     const createdBy = req.session.currentUser._id;
     const gameStatus = 'waitingForPlayers';
+    const gamesToWin = 3;
 
-    Game.create({roundTime, numberOfPlayers, createdBy, gameStatus})
+    Game.create({roundTime, numberOfPlayers, createdBy, gameStatus, gamesToWin})
         .then( newGame => {
             res.status(201).json(newGame);
         })

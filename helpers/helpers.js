@@ -3,7 +3,8 @@
 exports.setGameStatus = (game, status) => game.status = status;
 
 exports.checkGameReady = game => {
-    if (game.numberOfPlayers === game.table.length && game.teamA.length === game.teamB.length && game.status === 'waitingForPlayers' || game.status === 'Ready') return true
+    console.log('game in checkgame', game);
+    if (game.gameStatus === 'Ready' || game.numberOfPlayers === game.table.length && game.teamA.length === game.teamB.length && game.gameStatus === 'waitingForPlayers') return true
     else return false;
 }
 
