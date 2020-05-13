@@ -134,10 +134,6 @@ socketAuth (io, {
 
       }  
         
-      
-      //cambiar estado a running
-      //escribir juego a base de datos
-      //barajar cartas
     })
   });
 

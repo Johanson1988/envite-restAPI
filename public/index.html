@@ -101,6 +101,8 @@ const connect = () => {
     disconnectButton.disabled = true;
   });
 
+  socket.on('new-hand', hand => console.log('Nueva Mano: ', hand) );
+
   socket.on('send-game-data', message => console.log(message));
 
   socket.on('chat message', (msg, username) => {    

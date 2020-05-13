@@ -43,12 +43,21 @@ exports.shuffleCards = (io, socket) => {
     { valor: 1, palo: 'bastos' }, { valor: 2, palo: 'bastos' }, { valor: 3, palo: 'bastos' }, { valor: 4, palo: 'bastos' }, { valor: 5, palo: 'bastos' }, { valor: 6, palo: 'bastos' }, { valor: 7, palo: 'bastos' }, { valor: 'sota', palo: 'bastos' }, { valor: 'caballo', palo: 'bastos' }, { valor: 'rey', palo: 'bastos' },
     { valor: 1, palo: 'espadas' }, { valor: 2, palo: 'espadas' }, { valor: 3, palo: 'espadas' }, { valor: 4, palo: 'espadas' }, { valor: 5, palo: 'espadas' }, { valor: 6, palo: 'espadas' }, { valor: 7, palo: 'espadas' }, { valor: 'sota', palo: 'espadas' }, { valor: 'caballo', palo: 'espadas' }, { valor: 'rey', palo: 'espadas' }];
     const clients = Object.keys(io.sockets.adapter.rooms[game._id].sockets);
-    clients.forEach(client => {
+    
+    
+    
+    game.table.forEach(player => {
         const hand = [];
         for (i = 0; i < 3; i++) {
             hand.push(deck.splice(Math.ceil(Math.random()*deck.length),1)[0]);
         }
-        console.log(hand);
-    });
+    console.log(player, hand);
     
+    clients.forEach(client => io.sockets.connected[client].user._id === player.id ?
+        io.to(client).emit('new-hand', hand) : console.log(io.sockets.connected[client].user._id, player));
+    });
+    const cardTurntUp = deck.splice(Math.ceil(Math.random()*deck.length),1)[0];
+    console.log('Vira', cardTurntUp);
+    
+    return cardTurntUp;
 }
