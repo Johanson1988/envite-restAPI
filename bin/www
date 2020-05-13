@@ -120,12 +120,12 @@ socketAuth (io, {
       if (/*userId !== gameAdminId ||*/ !checkGameReady(game)) success(false);
       else {
         game.gameStatus = 'Running';
-        sendGameData(io,socket);
-        updateGame(io, socket);
         try {
           let {teamA, teamB, table, gameStatus} = game;
           table = table.map(player => player ? player.id : null);
-          Game.findOneAndUpdate({ _id:game._id },{ teamA, teamB, table, gameStatus },{returnNewDocument: true});
+          Game.findOneAndUpdate({ _id:game._id },{ teamA, teamB, table, gameStatus });
+          sendGameData(io,socket);
+          updateGame(io, socket);
           success(true);
           shuffleCards(io, socket);
         }
