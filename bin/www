@@ -110,11 +110,14 @@ socketAuth (io, {
     });
 
     socket.on('start-game', (success) => {
-      console.log('Iniciar juego');
       const Game = require('./../models/Game');
-      const { checkGameReady, sendGameData, updateGame } = require('./../helpers/helpers');
-      let {game} = socket;
-      if (checkGameReady(game) === false) success(false);
+      const { checkGameReady, sendGameData, updateGame, shuffleCards } = require('./../helpers/helpers');
+      let { game, user } = socket;
+      console.log('Iniciar juego', game._id);
+      const userId = user._id;
+      const gameAdminId = game.createdBy;
+      console.log(userId !== gameAdminId, user._id, game.createdBy, !checkGameReady(game));
+      if (/*userId !== gameAdminId ||*/ !checkGameReady(game)) success(false);
       else {
         game.gameStatus = 'Running';
         sendGameData(io,socket);
@@ -123,6 +126,8 @@ socketAuth (io, {
           let {teamA, teamB, table, gameStatus} = game;
           table = table.map(player => player ? player.id : null);
           Game.findOneAndUpdate({ _id:game._id },{ teamA, teamB, table, gameStatus },{returnNewDocument: true});
+          success(true);
+          shuffleCards(io, socket);
         }
         catch (e) {
           console.error(e);
@@ -130,8 +135,6 @@ socketAuth (io, {
           game.gameStatus = 'waitingForPlayers';
         }
         
-        success(true);
-
       }  
         
     })

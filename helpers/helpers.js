@@ -49,7 +49,7 @@ exports.shuffleCards = (io, socket) => {
     game.table.forEach(player => {
         const hand = [];
         for (i = 0; i < 3; i++) {
-            hand.push(deck.splice(Math.ceil(Math.random()*deck.length),1)[0]);
+            hand.push(deck.splice(Math.ceil(Math.random()*deck.length-1),1)[0]);
         }
     console.log(player, hand);
     
