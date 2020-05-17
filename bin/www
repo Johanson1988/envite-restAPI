@@ -57,7 +57,7 @@ socketAuth (io, {
       console.log(`Socket ${socket.id} authenticated.`);
       //TODO comprobar que el usuario no está ya en la mesa
       socket.join(socket.game._id);
-      const { getUpdatedGame } = require('./../helpers/helpers');      
+      const { getUpdatedGame, sendGameData } = require('./../helpers/helpers');      
       socket.game = getUpdatedGame(io, socket);
       sendGameData(io, socket);
     },
