@@ -59,6 +59,7 @@ socketAuth (io, {
       socket.join(socket.game._id);
       const { getUpdatedGame } = require('./../helpers/helpers');      
       socket.game = getUpdatedGame(io, socket);
+      sendGameData(io, socket);
     },
     disconnect: socket => {
       console.log(`Socket ${socket.id} disconnected.`);
