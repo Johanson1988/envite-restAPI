@@ -3,7 +3,7 @@
 exports.setGameStatus = (game, status) => game.status = status;
 
 exports.checkGameReady = game => {
-    console.log('game in checkgame', game);
+   // console.log('game in checkgame', game);
     console.log('game.gameStatus === \'Ready\'', game.gameStatus === 'Ready' );
     console.log('game.numberOfPlayers === game.table.length', game.numberOfPlayers === game.table.length);
     console.log('game.teamA.length === game.teamB.length', game.teamA.length === game.teamB.length);
@@ -51,7 +51,7 @@ exports.shuffleCards = (io, socket) => {
         for (i = 0; i < 3; i++) {
             hand.push(deck.splice(Math.ceil(Math.random()*deck.length-1),1)[0]);
         }
-    console.log(player, hand);
+    //console.log(player, hand);
     
     clients.forEach(client => io.sockets.connected[client].user._id === player.id ?
         io.to(client).emit('new-hand', hand) : console.log(io.sockets.connected[client].user._id, player));

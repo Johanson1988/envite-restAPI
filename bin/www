@@ -107,10 +107,20 @@ socketAuth (io, {
       console.log('Juego terminado', socket.game.gameStatus);
       const { shuffleCards } = require('./../helpers/helpers');
 
-      shuffleCards(io, socket);
+      //shuffleCards(io, socket);
     });
 
-    socket.on('start-game', (success) => {
+    socket.on('start-game', async (success) => {
+
+      async function waitToTurnFinished(socket) {
+        // return await for better async stack trace support in case of errors.
+        return await new Promise(resolve => {
+          while (true) {
+            if (socket.game.turnFinished) break;
+          }
+        });
+      }
+
       const Game = require('./../models/Game');
       const { checkGameReady, sendGameData, updateGame, shuffleCards } = require('./../helpers/helpers');
       let { game, user } = socket;
@@ -125,10 +135,41 @@ socketAuth (io, {
           let {teamA, teamB, table, gameStatus} = game;
           table = table.map(player => player ? player.id : null);
           Game.findOneAndUpdate({ _id:game._id },{ teamA, teamB, table, gameStatus });
-          sendGameData(io,socket);
-          updateGame(io, socket);
           success(true);
-          shuffleCards(io, socket);
+
+            socket.game.dealer = Math.ceil(Math.random()*table.length);
+            socket.game.activePlayer = socket.game.dealer + 1;
+
+            //una vez se tiene esto, se manda el turno jugador activo y ahi se hace el interval
+            updateGame(io, socket);
+            sendGameData(io,socket);
+            //interval mandando segundos
+            let counter = game.roundTime;
+            let counterId = setInterval(() => {
+              io.to(socket.game._id).emit('timer', counter);
+              console.log('counter: ', counter--);
+              if (counter < 0 ) {
+                game.turnFinished = true;
+                clearInterval(counterId);
+                //hacer cambio de turno por defecto
+              }
+            }, 1000);
+            console.log(parseInt(game.roundTime));
+            //await waitToTurnFinished(socket);
+            
+            //cuenta atrás para pasar al siguiente turno
+              //pasar siguiente turno
+              //cambiar jugador activo
+              //matar intervalo
+
+            //activar time out hasta fin de turno
+          
+
+/* hacer primero secuencia sin intervalos de tiempo, cuando un jugador mueve, pasa el turno al otro
+          en cada turno, se inicia un intervalo, q si se termina pasa turno, si el jugador mueve, mat ael intervalo
+          console.log('Dealer:', socket.game.dealer);
+
+         // shuffleCards(io, socket);
         }
         catch (e) {
           console.error(e);
@@ -138,6 +179,10 @@ socketAuth (io, {
         
       }  
         
+    })
+
+    socket.on('game-move', move => {
+      console.log(socket.user.username, move);
     })
   });
 

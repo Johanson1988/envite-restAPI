@@ -14,7 +14,7 @@ const gameSchema = new Schema({
     scoreTeamB: [{ type: Number }],
     chicos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chico' }],
     numberOfPlayers: { type: Number, enum: [4, 6, 8, 10], required: true },
-    roundTime: { type: String, enum: ['30s', '60s', '90s', '180s', 'no-limit' ]},
+    roundTime: { type: String, enum: ['30', '60', '90', '180', 'no-limit' ]},
     table: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
   }, {
     timestamps: {
