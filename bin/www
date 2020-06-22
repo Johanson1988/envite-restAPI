@@ -112,15 +112,6 @@ socketAuth (io, {
 
     socket.on('start-game', async (success) => {
 
-      async function waitToTurnFinished(socket) {
-        // return await for better async stack trace support in case of errors.
-        return await new Promise(resolve => {
-          while (true) {
-            if (socket.game.turnFinished) break;
-          }
-        });
-      }
-
       const Game = require('./../models/Game');
       const { checkGameReady, sendGameData, updateGame, shuffleCards } = require('./../helpers/helpers');
       let { game, user } = socket;
@@ -144,7 +135,7 @@ socketAuth (io, {
             updateGame(io, socket);
             sendGameData(io,socket);
             //interval mandando segundos
-            let counter = game.roundTime;
+           /* let counter = game.roundTime;
             let counterId = setInterval(() => {
               io.to(socket.game._id).emit('timer', counter);
               console.log('counter: ', counter--);
@@ -156,6 +147,7 @@ socketAuth (io, {
             }, 1000);
             console.log(parseInt(game.roundTime));
             //await waitToTurnFinished(socket);
+            */
             
             //cuenta atrás para pasar al siguiente turno
               //pasar siguiente turno
@@ -165,8 +157,8 @@ socketAuth (io, {
             //activar time out hasta fin de turno
           
 
-/* hacer primero secuencia sin intervalos de tiempo, cuando un jugador mueve, pasa el turno al otro
-          en cada turno, se inicia un intervalo, q si se termina pasa turno, si el jugador mueve, mat ael intervalo
+// hacer primero secuencia sin intervalos de tiempo, cuando un jugador mueve, pasa el turno al otro
+  //        en cada turno, se inicia un intervalo, q si se termina pasa turno, si el jugador mueve, mat ael intervalo
           console.log('Dealer:', socket.game.dealer);
 
          // shuffleCards(io, socket);
