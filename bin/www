@@ -177,12 +177,12 @@ socketAuth (io, {
     });
 
     socket.on('game-move', move => {
-      console.log(socket.game.table);
+      
       const { table, activePlayer, dealer } = socket.game;
-      console.log(activePlayer, dealer, table.length);
-      const { _id } = socket.user;
-      const activePlayerId = table[activePlayer];
-      console.log(_id, activePlayerId, _id === activePlayerId);
+      
+      const  _id  = `${socket.user._id}`;
+      const activePlayerId = `${table[activePlayer]}`;
+      
       if(activePlayerId === _id) console.log(socket.user.username, move);
       else console.log("Wrong player");
     });
