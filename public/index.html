@@ -51,6 +51,14 @@
         Parar juego
       </button>
     </p>
+    <p>
+      <label for="movement">Movement: </label>
+      <input type="text" id="movement" name="movement" />
+      <button id="movement-button">
+        Send!
+      </button>
+    </p>
+
     <ul id="messages"></ul>
     <form action="">
       <input id="m" autocomplete="off" /><button id="enviar">Send</button>
@@ -122,6 +130,10 @@ const sendSeat = _ => {
     socket.emit('new-seat', seat, (success) => console.log(success));
   }
 
+  const sendMovement = movement => {
+    socket.emit('game-move', movement);
+  }
+
 
 /*socket.on('players list', function(msg){
     console.log('Jugadores online: ' + msg);
@@ -135,6 +147,14 @@ botonEnviar.addEventListener('click', e => {
   socket.emit('chat message', mensaje.value);
   mensaje.value = '';
   console.log('enviado', e);
+});
+
+const botonEnviarMovimiento = document.querySelector("#movement-button");
+
+botonEnviarMovimiento.addEventListener('click', e => {
+  e.preventDefault();
+  const movementInput = document.querySelector("#movement");
+  sendMovement(movementInput.value);
 })
 
 const  startGame = document.querySelector('#start-game');
