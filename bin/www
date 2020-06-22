@@ -124,12 +124,15 @@ socketAuth (io, {
         game.gameStatus = 'Running';
         try {
           let {teamA, teamB, table, gameStatus} = game;
-          table = table.map(player => player ? player.id : null);
-          Game.findOneAndUpdate({ _id:game._id },{ teamA, teamB, table, gameStatus });
+          const parsedTable = table.map(player => player ? player.id : null);
+          Game.findOneAndUpdate({ _id:game._id },{ teamA, teamB, table: parsedTable, gameStatus });
           success(true);
 
-            socket.game.dealer = Math.ceil(Math.random()*table.length);
-            socket.game.activePlayer = socket.game.dealer + 1;
+            socket.game.dealer = Math.floor(Math.random()*table.length);
+            
+            socket.game.dealer === table.length - 1 ? 
+              socket.game.activePlayer = 0 :
+              socket.game.activePlayer = socket.game.dealer + 1;
 
             //una vez se tiene esto, se manda el turno jugador activo y ahi se hace el interval
             updateGame(io, socket);
@@ -171,11 +174,18 @@ socketAuth (io, {
         
       }  
         
-    })
+    });
 
     socket.on('game-move', move => {
-      console.log(socket.user.username, move);
-    })
+      console.log(socket.game.table);
+      const { table, activePlayer, dealer } = socket.game;
+      console.log(activePlayer, dealer, table.length);
+      const { _id } = socket.user;
+      const activePlayerId = table[activePlayer];
+      console.log(_id, activePlayerId, _id === activePlayerId);
+      if(activePlayerId === _id) console.log(socket.user.username, move);
+      else console.log("Wrong player");
+    });
   });
 
 /**
